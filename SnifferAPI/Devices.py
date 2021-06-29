@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from . import Notifications
 import logging
+import string
 
 
 class DeviceList(Notifications.Notifier):
@@ -115,7 +116,9 @@ class Device:
     def __init__(self, address, name, RSSI, txAdd=1):
         self.address = address
         self.txAdd = txAdd
-        self.name = name
+        self.name = "".join([x for x in name if x in string.printable])
+        if self.name == '""':
+            self.name = None
         self.RSSI = RSSI
         # self.selected = selected
         self.followed = False

@@ -149,11 +149,17 @@ if __name__ == '__main__':
                            default=False,
                            help="verbose mode (all serial traffic is displayed)")
 
+    argparser.add_argument("-s", "--scan",
+                           dest="scanonly",
+                           action="store_true",
+                           default=False,
+                           help="Scan only")
+
     # Parser the arguments passed in from the command-line
     args = argparser.parse_args()
 
     # Display the libpcap logfile location
-    print("Capturing data to " + args.logfile)
+    # print("Capturing data to " + args.logfile)
     CaptureFiles.captureFilePath = args.logfile
 
     # Try to open the serial port
@@ -183,30 +189,56 @@ if __name__ == '__main__':
             d = Device(_mac, name="NoDeviceName", RSSI=-72, txAdd=args.txaddr)
 
         # loop will be skipped if a target device is specified on commandline
-        while d is None:
-            print("Scanning for BLE devices (5s) ...")
+        if args.scanonly:
+            # count = 1
+            print("Scanning for BLE devices ...")
             devlist = scanForDevices()
-            if len(devlist):
-                # Select a device
-                d = selectDevice(devlist)
-
-        # Start sniffing the selected device
-        print("Attempting to follow device {0}:{1}:{2}:{3}:{4}:{5}".format("%02X" % d.address[0],
-                                                                           "%02X" % d.address[1],
-                                                                           "%02X" % d.address[2],
-                                                                           "%02X" % d.address[3],
-                                                                           "%02X" % d.address[4],
-                                                                           "%02X" % d.address[5]))
-        # Make sure we actually followed the selected device (i.e. it's still available, etc.)
-        if d is not None:
-            mySniffer.follow(d)
+            for d in devlist.asList():
+                """@type : Device"""
+                # count += 1
+                """
+                print("{0} : {1}, {2}:{3}:{4}:{5}:{6}:{7}, RSSI = {8}".format(count, d.name,
+                                                                                 "%02X" % d.address[0],
+                                                                                 "%02X" % d.address[1],
+                                                                                 "%02X" % d.address[2],
+                                                                                 "%02X" % d.address[3],
+                                                                                 "%02X" % d.address[4],
+                                                                                 "%02X" % d.address[5],
+                                                                                 d.RSSI))
+                """
+                print("{}, {}:{}:{}:{}:{}:{}, RSSI = {}".format("None" if d.name is None else d.name , 
+                                                                                 "%02X" % d.address[0],
+                                                                                 "%02X" % d.address[1],
+                                                                                 "%02X" % d.address[2],
+                                                                                 "%02X" % d.address[3],
+                                                                                 "%02X" % d.address[4],
+                                                                                 "%02X" % d.address[5],
+                                                                                 d.RSSI))
         else:
-            print("ERROR: Could not find the selected device")
+            while d is None:
+                print("Scanning for BLE devices (5s) ...")
+                devlist = scanForDevices()
+                if len(devlist):
+                    # Select a device
+                    d = selectDevice(devlist)
 
-        # Dump packets
-        while True:
-            dumpPackets()
-            time.sleep(1)
+            # Start sniffing the selected device
+            print("Attempting to follow device {0}:{1}:{2}:{3}:{4}:{5}".format("%02X" % d.address[0],
+                                                                               "%02X" % d.address[1],
+                                                                               "%02X" % d.address[2],
+                                                                               "%02X" % d.address[3],
+                                                                               "%02X" % d.address[4],
+                                                                               "%02X" % d.address[5]))
+            # Make sure we actually followed the selected device (i.e. it's still available, etc.)
+            if d is not None:
+                mySniffer.follow(d)
+            else:
+                print("ERROR: Could not find the selected device")
+
+            # Dump packets
+            while True:
+                dumpPackets()
+                time.sleep(1)
 
         # Close gracefully
         mySniffer.doExit()

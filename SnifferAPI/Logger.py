@@ -19,10 +19,13 @@ from six.moves import range
 #################################################################
 
 try:
-    logFilePath = os.path.join(
-        os.getenv('appdata'), 'Nordic Semiconductor', 'Sniffer', 'logs')
+    if os.getenv('appdata') is not None:
+        logFilePath = os.path.join(os.getenv('appdata'), 'Nordic Semiconductor', 'Sniffer', 'logs')
+    else:
+        logFilePath = "logs"
 except AttributeError:
     logFilePath = "logs"
+    pass
 
 logFileName = os.path.join(logFilePath, 'log.txt')
 

@@ -476,7 +476,16 @@ class BlePacket():
             name = '"'+name+'"'
         elif (self.advType == 1):
             name = "[ADV_DIRECT_IND]"
+        # else:
+        elif (self.advType == 4):
+            print("----------{}----------".format(self.advType))
+            print([ hex(x) for x in packetList])
+        # print(packetList)
+        # print([ hex(x) for x in packetList])
 
+        # print("--------------------")
+        # print(name.decode(encoding="UTF-8"))
+        # print("--------------------")
         self.name = name  # .decode(encoding="UTF-8")
 
     def extractLength(self, packetList):

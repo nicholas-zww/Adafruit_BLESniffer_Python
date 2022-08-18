@@ -137,7 +137,6 @@ class SnifferCollector(Notifications.Notifier):
                             or packet.blePacket.advType == 6
                             ) and (packet.blePacket.advAddress is not None
                                    ) and (packet.crcOK and not packet.direction):
-
                             newDevice = Devices.Device(
                                 address=packet.blePacket.advAddress, name=packet.blePacket.name,
                                 RSSI=packet.RSSI, txAdd=packet.txAdd)
@@ -217,8 +216,10 @@ class SnifferCollector(Notifications.Notifier):
     def _startFollowing(self, device, followOnlyAdvertisements=False):
 
         self._devices.setFollowed(device)
-        logging.info("Sniffing device " +
-                     str(self._devices.index(device)) + ' - "'+device.name+'"')
+        if device.name is not None:
+            logging.info("Sniffing device " + str(self._devices.index(device)) + ' - "'+device.name+'"')
+        else:
+            logging.info("Sniffing device " + str(self._devices.index(device)) + ' - "No Name""')
         self._packetReader.sendFollow(
             device.address, device.txAdd, followOnlyAdvertisements)
         self._setState(STATE_FOLLOWING)

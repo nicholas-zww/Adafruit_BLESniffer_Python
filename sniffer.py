@@ -89,6 +89,7 @@ def selectDevice(devlist):
         except:
             return None
 
+
         # Select a device or scan again, depending on the input
         if (i > 0) and (i <= count):
             # Select the indicated device
